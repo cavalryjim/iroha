@@ -415,6 +415,7 @@ jobs:
       - &step_vcpkg_cache
         ## Read the docs https://vcpkg.readthedocs.io/en/latest/users/binarycaching/ https://github.com/microsoft/vcpkg/blob/master/docs/users/binarycaching.md
         name: Restore cache Vcpkg binarycache ## NOTE not useng NuGet because on ubuntu nuget needs mono of 433MB, unusable.
+        id: restore_vcpkg_cache
         uses: actions/cache@v2
         with:
           path: |
@@ -422,6 +423,7 @@ jobs:
           key:          ${{runner.os}}-vcpkg-${{env.CC_NAME}}.${{ hashFiles('vcpkg/**') }}
           restore-keys: ${{runner.os}}-vcpkg-${{env.CC_NAME}}.
       - &step_vcpkg_build
+        if: ${{ steps.restore_vcpkg_cache.outcome == 'success' }}
         name: Build iroha vcpkg dependancies
         run: ./vcpkg/build_iroha_deps.sh $PWD/vcpkg-build; test -f $PWD/vcpkg-build/scripts/buildsystems/vcpkg.cmake
         ## Takes 48m16s on default GitHub runner with 2 cores
